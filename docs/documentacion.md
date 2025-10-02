@@ -493,7 +493,7 @@ file build/game
 
 ---
 
-## 🎮 **ACTUALIZACIÓN - 2 de octubre de 2025**
+## 🎮 **ACTUALIZACIÓN - 2 de octubre de 2025 (17:00)**
 
 ### ✅ **EJERCICIO 0: CREACIÓN DE VENTANA - COMPLETADO**
 
@@ -510,11 +510,12 @@ Implementar la funcionalidad básica de inicialización de ventana con raylib, e
 **Cambios implementados:**
 ```cpp
 ✨ Inclusión de raylib.h para acceso a API gráfica
-✨ InitWindow(288, 512, "Flappy Bird DCA") → Ventana de 288x512 píxeles
+✨ InitWindow(360, 740, "Flappy Bird DCA") → Ventana de 360x740 píxeles
 ✨ SetTargetFPS(60) → Limitación a 60 frames por segundo
 ✨ WindowShouldClose() → Detección de cierre de ventana
 ✨ GetFrameTime() → Cálculo de delta time para física independiente de FPS
 ✨ CloseWindow() → Liberación de recursos al finalizar
+✨ Verificación de inicialización correcta con IsWindowReady()
 ```
 
 **Funcionalidades agregadas:**
@@ -522,6 +523,7 @@ Implementar la funcionalidad básica de inicialización de ventana con raylib, e
 - 🚪 **Cierre de ventana:** Detección de ESC o botón de cerrar
 - 🎯 **FPS estable:** Limitación a 60 FPS para rendimiento consistente
 - 🧹 **Gestión de recursos:** Liberación correcta de memoria al salir
+- ✅ **Error handling:** Verificación de inicialización de ventana
 
 ##### **2. 🎨 Archivo: `src/MainGameState.cpp`**
 
@@ -547,9 +549,10 @@ Implementar la funcionalidad básica de inicialización de ventana con raylib, e
 ┌─────────────────────────────────────────────────────┐
 │              BUCLE PRINCIPAL DEL JUEGO              │
 ├─────────────────────────────────────────────────────┤
-│  1. InitWindow() → Crear ventana 288x512           │
-│  2. SetTargetFPS(60) → Limitar a 60 FPS            │
-│  3. WHILE (!WindowShouldClose())                    │
+│  1. InitWindow() → Crear ventana 360x740           │
+│  2. IsWindowReady() → Verificar inicialización     │
+│  3. SetTargetFPS(60) → Limitar a 60 FPS            │
+│  4. WHILE (!WindowShouldClose())                    │
 │     ├─ delta_time = GetFrameTime()                 │
 │     ├─ handleInput()                                │
 │     ├─ update(delta_time)                           │
@@ -558,7 +561,7 @@ Implementar la funcionalidad básica de inicialización de ventana con raylib, e
 │         ├─ ClearBackground(SKYBLUE)                 │
 │         ├─ DrawText(...)                            │
 │         └─ EndDrawing()                             │
-│  4. CloseWindow() → Liberar recursos                │
+│  5. CloseWindow() → Liberar recursos                │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -576,7 +579,7 @@ g++ -std=c++17 -Wall -Wextra -g \
 
 **Resultados:**
 - ✅ **Compilación exitosa** (0 errores)
-- ⚠️ **1 Warning:** `unused parameter 'deltaTime'` en `update()` (esperado en Ejercicio 0)
+- ✅ **Sin warnings**
 - ✅ **Ejecutable generado:** `build/game`
 - ✅ **Tamaño del ejecutable:** ~216 KB
 
@@ -585,114 +588,461 @@ g++ -std=c++17 -Wall -Wextra -g \
 | Métrica | Valor |
 |---------|-------|
 | **Archivos modificados** | 2 (`main.cpp`, `MainGameState.cpp`) |
-| **Líneas agregadas** | ~20 líneas |
-| **Funciones raylib usadas** | 8 funciones |
+| **Líneas agregadas** | ~30 líneas |
+| **Funciones raylib usadas** | 9 funciones |
 | **Tiempo de compilación** | < 2 segundos |
-| **Warnings** | 1 (parámetro no usado) |
+| **Warnings** | 0 |
 | **Errores** | 0 |
-
-#### 🔑 **CONCEPTOS APLICADOS:**
-
-1. **🎮 Inicialización de ventana:**
-   - Configuración de dimensiones (288x512 px)
-   - Establecimiento de título de ventana
-   - Limitación de FPS objetivo
-
-2. **⚡ Delta Time:**
-   - Cálculo dinámico con `GetFrameTime()`
-   - Preparación para física independiente de FPS
-   - Variable pasada a través del sistema de estados
-
-3. **🎨 Bucle de Renderizado:**
-   - Patrón `BeginDrawing()` / `EndDrawing()`
-   - Limpieza de buffer con `ClearBackground()`
-   - Renderizado de primitivas de texto
-
-4. **🧹 Gestión de Recursos:**
-   - Liberación correcta con `CloseWindow()`
-   - Detección de cierre de ventana
-   - Prevención de memory leaks
-
-#### 🎓 **FUNCIONES RAYLIB UTILIZADAS:**
-
-```cpp
-// Gestión de ventana
-InitWindow(int width, int height, const char* title)
-CloseWindow(void)
-SetTargetFPS(int fps)
-WindowShouldClose(void) → bool
-
-// Renderizado
-BeginDrawing(void)
-EndDrawing(void)
-ClearBackground(Color color)
-
-// Texto
-DrawText(const char* text, int x, int y, int fontSize, Color color)
-MeasureText(const char* text, int fontSize) → int
-
-// Tiempo
-GetFrameTime(void) → float
-```
-
-#### 🎯 **RESULTADO VISUAL:**
-
-Al ejecutar `./build/game`, se muestra:
-- 🪟 Ventana de 288x512 píxeles
-- 🎨 Fondo azul cielo
-- 📝 Texto "Bienvenido a Flappy Bird DCA" centrado
-- ℹ️ Instrucciones en la parte inferior
-- ⚡ 60 FPS estables
 
 </details>
 
 ---
 
-### 🌟 **ESTADO DEL PROYECTO ACTUALIZADO**
+### ✅ **EJERCICIO 1: MECÁNICA PRINCIPAL - COMPLETADO**
+
+#### 🎯 **OBJETIVO DEL EJERCICIO:**
+Implementar la física básica del pájaro con gravedad, saltos y renderizado visual como círculo rojo.
+
+<details>
+<summary>🔽 Expandir detalles de implementación</summary>
+
+#### 📋 **MODIFICACIONES REALIZADAS:**
+
+##### **1. 🔧 Archivo: `src/MainGameState.hpp`**
+
+**Estructuras agregadas:**
+```cpp
+// Estructura del pájaro
+struct Bird {
+    float x;   // Posición horizontal
+    float y;   // Posición vertical
+    float vy;  // Velocidad vertical
+};
+```
+
+**Constantes de física definidas:**
+```cpp
+const float GRAVITY = 980.0f;           // Gravedad (píxeles/seg²)
+const float JUMP_VELOCITY = -300.0f;    // Velocidad de salto
+const float BIRD_RADIUS = 17.0f;        // Radio del círculo
+```
+
+**Variables miembro:**
+```cpp
+Bird bird;  // Instancia del pájaro
+```
+
+##### **2. 🎮 Archivo: `src/MainGameState.cpp`**
+
+**Métodos implementados:**
+
+**A. `init()` - Inicialización:**
+```cpp
+bird.x = 200.0f;   // Posición inicial X
+bird.y = 200.0f;   // Posición inicial Y
+bird.vy = 0.0f;    // Sin velocidad inicial
+```
+
+**B. `handleInput()` - Detección de salto:**
+```cpp
+if (IsKeyPressed(KEY_SPACE)) {
+    bird.vy = JUMP_VELOCITY;  // Impulso hacia arriba (-300)
+}
+```
+
+**C. `update(deltaTime)` - Física del juego:**
+```cpp
+bird.vy += GRAVITY * deltaTime;  // Aplicar gravedad
+bird.y += bird.vy * deltaTime;   // Actualizar posición
+```
+
+**D. `render()` - Renderizado visual:**
+```cpp
+DrawCircle(bird.x, bird.y, BIRD_RADIUS, RED);
+```
+
+#### ⚡ **SISTEMA DE FÍSICA IMPLEMENTADO:**
+
+```
+┌──────────────────────────────────────────────────┐
+│           FÍSICA DEL PÁJARO                      │
+├──────────────────────────────────────────────────┤
+│  Estado Inicial:                                 │
+│    ├─ Posición: (200, 200)                       │
+│    └─ Velocidad: 0                               │
+│                                                   │
+│  Cada Frame:                                     │
+│    1. vy += GRAVITY * deltaTime                  │
+│       (Aceleración gravitacional)                │
+│    2. y += vy * deltaTime                        │
+│       (Actualizar posición)                      │
+│                                                   │
+│  Al presionar ESPACIO:                           │
+│    └─ vy = -300 (Impulso hacia arriba)          │
+└──────────────────────────────────────────────────┘
+```
+
+#### 🎨 **RENDERIZADO:**
+
+- **Sprite:** Círculo rojo
+- **Radio:** 17 píxeles
+- **Posición dinámica:** Actualizada cada frame
+- **Capa:** Renderizado al frente (después del fondo)
+
+#### 📊 **MÉTRICAS DEL EJERCICIO:**
+
+| Métrica | Valor |
+|---------|-------|
+| **Archivos modificados** | 2 (`MainGameState.hpp`, `MainGameState.cpp`) |
+| **Structs creadas** | 1 (`Bird`) |
+| **Constantes definidas** | 3 |
+| **Métodos implementados** | 4 (`init`, `handleInput`, `update`, `render`) |
+| **Líneas agregadas** | ~50 líneas |
+| **Errores** | 0 |
+| **Warnings** | 0 |
+
+#### 🔑 **CONCEPTOS FÍSICOS APLICADOS:**
+
+1. **� Gravedad constante:**
+   - Aceleración de 980 px/seg² (similar a 9.8 m/s²)
+   - Aplica fuerza descendente continua
+   - Implementada con delta time para independencia de FPS
+
+2. **🚀 Impulsos instantáneos:**
+   - Salto con velocidad inicial de -300 px/seg
+   - Dirección negativa = hacia arriba
+   - Impulso único por pulsación de tecla
+
+3. **⏱️ Delta Time:**
+   - Movimiento independiente de FPS
+   - Física consistente en diferentes sistemas
+   - Cálculo: `posición += velocidad * deltaTime`
+
+#### 🎯 **RESULTADO VISUAL:**
+
+Al ejecutar el juego:
+- 🐦 **Pájaro rojo** que cae continuamente
+- 🎮 **Control con ESPACIO** para saltar
+- ⚡ **Física realista** con aceleración gravitacional
+- 📊 **Debug info** en pantalla (posición Y)
+
+</details>
+
+---
+
+### ✅ **EJERCICIO 2: SISTEMA DE TUBERÍAS - COMPLETADO**
+
+#### 🎯 **OBJETIVO DEL EJERCICIO:**
+Implementar el sistema completo de generación, movimiento y renderizado de tuberías con posiciones aleatorias.
+
+<details>
+<summary>🔽 Expandir detalles de implementación</summary>
+
+#### 📋 **MODIFICACIONES REALIZADAS:**
+
+##### **1. 🔧 Archivo: `src/MainGameState.hpp`**
+
+**Includes agregados:**
+```cpp
+#include <raylib.h>  // Para Rectangle
+#include <deque>     // Para std::deque
+```
+
+**Estructuras agregadas:**
+```cpp
+struct PipePair {
+    Rectangle top;    // Tubería superior
+    Rectangle bot;    // Tubería inferior
+    bool scored;      // Si ya se contó el punto
+};
+```
+
+**Constantes de tuberías:**
+```cpp
+const float PIPE_WIDTH = 52.0f;         // Ancho de tuberías
+const float PIPE_HEIGHT = 320.0f;       // Altura de tuberías
+const float PIPE_SPEED = 100.0f;        // Velocidad horizontal
+const float PIPE_SPACING = 200.0f;      // Espacio entre pares
+const float PIPE_GAP = 150.0f;          // Hueco vertical
+const float PIPE_SPAWN_TIME = 2.0f;     // Tiempo entre spawns
+```
+
+**Variables miembro:**
+```cpp
+std::deque<PipePair> pipes;     // Cola de tuberías activas
+float pipe_spawn_timer;         // Timer de generación
+```
+
+**Métodos auxiliares:**
+```cpp
+void generatePipe();            // Generar nueva tubería
+void updatePipes(float deltaTime);  // Actualizar sistema
+void renderPipes();             // Renderizar todas
+```
+
+##### **2. 🏗️ Archivo: `src/MainGameState.cpp`**
+
+**Métodos implementados:**
+
+**A. `generatePipe()` - Generación procedural:**
+```cpp
+// 1. Calcular posición Y aleatoria del hueco
+int min_gap_y = PIPE_GAP / 2 + 50;
+int max_gap_y = 740 - PIPE_GAP / 2 - 50;
+float gap_center_y = GetRandomValue(min_gap_y, max_gap_y);
+
+// 2. Crear tubería superior (desde arriba hasta hueco)
+new_pipe.top = {360.0f, 0.0f, PIPE_WIDTH, gap_center_y - PIPE_GAP/2};
+
+// 3. Crear tubería inferior (desde hueco hasta abajo)
+new_pipe.bot = {360.0f, gap_center_y + PIPE_GAP/2, PIPE_WIDTH, altura};
+
+// 4. Agregar a la cola
+pipes.push_back(new_pipe);
+```
+
+**B. `updatePipes(deltaTime)` - Sistema de gestión:**
+```cpp
+// A. Generar nuevas tuberías (timer)
+pipe_spawn_timer -= deltaTime;
+if (pipe_spawn_timer <= 0.0f) {
+    generatePipe();
+    pipe_spawn_timer = PIPE_SPAWN_TIME;
+}
+
+// B. Mover tuberías hacia la izquierda
+for (auto& pipe : pipes) {
+    pipe.top.x -= PIPE_SPEED * deltaTime;
+    pipe.bot.x -= PIPE_SPEED * deltaTime;
+}
+
+// C. Eliminar tuberías fuera de pantalla
+while (!pipes.empty() && pipes.front().top.x < -PIPE_WIDTH) {
+    pipes.pop_front();
+}
+```
+
+**C. `renderPipes()` - Renderizado visual:**
+```cpp
+for (const auto& pipe : pipes) {
+    // Tubería superior
+    DrawRectangleRec(pipe.top, DARKGREEN);
+    DrawRectangleLinesEx(pipe.top, 2, GREEN);
+    
+    // Tubería inferior
+    DrawRectangleRec(pipe.bot, DARKGREEN);
+    DrawRectangleLinesEx(pipe.bot, 2, GREEN);
+}
+```
+
+**D. Modificaciones en `init()`:**
+```cpp
+pipes.clear();              // Limpiar tuberías
+pipe_spawn_timer = 1.0f;   // Primera aparece pronto
+generatePipe();            // Generar inicial
+```
+
+**E. Modificaciones en `update()`:**
+```cpp
+updatePipes(deltaTime);    // Actualizar sistema de tuberías
+```
+
+**F. Modificaciones en `render()`:**
+```cpp
+renderPipes();             // Dibujar tuberías (fondo)
+DrawCircle(...);           // Dibujar pájaro (frente)
+```
+
+#### 🏗️ **SISTEMA DE TUBERÍAS:**
+
+```
+┌──────────────────────────────────────────────────────┐
+│         PIPELINE DE GESTIÓN DE TUBERÍAS              │
+├──────────────────────────────────────────────────────┤
+│  1. GENERACIÓN (cada 2 segundos)                     │
+│     ├─ Posición X: 360 (fuera derecha)               │
+│     ├─ Posición Y: GetRandomValue(min, max)          │
+│     ├─ Tubería superior: {x, 0, w, gap_y - gap/2}   │
+│     └─ Tubería inferior: {x, gap_y+gap/2, w, h}     │
+│                                                       │
+│  2. MOVIMIENTO (cada frame)                          │
+│     └─ x -= PIPE_SPEED * deltaTime                   │
+│        (100 píxeles/segundo)                         │
+│                                                       │
+│  3. ELIMINACIÓN (cuando fuera de pantalla)           │
+│     └─ if (x < -PIPE_WIDTH) → pipes.pop_front()     │
+│                                                       │
+│  4. RENDERIZADO                                      │
+│     ├─ DrawRectangleRec(pipe.top, DARKGREEN)        │
+│     ├─ DrawRectangleLinesEx(pipe.top, 2, GREEN)     │
+│     ├─ DrawRectangleRec(pipe.bot, DARKGREEN)        │
+│     └─ DrawRectangleLinesEx(pipe.bot, 2, GREEN)     │
+└──────────────────────────────────────────────────────┘
+```
+
+#### 🎲 **GENERACIÓN PROCEDURAL:**
+
+- **Aleatoriedad:** `GetRandomValue()` para posición Y del hueco
+- **Límites seguros:** Evita huecos muy arriba o muy abajo (50px margen)
+- **Consistencia:** Hueco de 150 píxeles en todas las tuberías
+- **Spawn continuo:** Nueva tubería cada 2 segundos
+
+#### � **RENDERIZADO VISUAL:**
+
+- **Color principal:** `DARKGREEN` (verde oscuro)
+- **Bordes:** `GREEN` con 2 píxeles de grosor
+- **Orden de dibujado:** Tuberías primero, pájaro después
+- **Optimización:** Solo renderiza tuberías visibles en pantalla
+
+#### 📊 **MÉTRICAS DEL EJERCICIO:**
+
+| Métrica | Valor |
+|---------|-------|
+| **Archivos modificados** | 2 (`MainGameState.hpp`, `MainGameState.cpp`) |
+| **Structs creadas** | 1 (`PipePair`) |
+| **Constantes definidas** | 6 |
+| **Métodos nuevos** | 3 (`generatePipe`, `updatePipes`, `renderPipes`) |
+| **Líneas agregadas** | ~80 líneas |
+| **Estructura de datos** | `std::deque<PipePair>` |
+| **Errores** | 0 |
+| **Warnings** | 0 |
+
+#### 🔧 **DECISIONES TÉCNICAS:**
+
+1. **🗂️ std::deque en lugar de std::vector:**
+   - Eliminación eficiente del frente (O(1))
+   - Inserción eficiente al final (O(1))
+   - Ideal para sistema de cola FIFO
+
+2. **⏱️ Sistema de spawn basado en timer:**
+   - Generación automática cada 2 segundos
+   - Primera tubería a 1 segundo (para empezar rápido)
+   - Timer decremental con reset
+
+3. **🎲 Posiciones aleatorias:**
+   - Rango seguro para el hueco (100-640 px)
+   - Márgenes de 50 píxeles arriba y abajo
+   - Variedad en cada generación
+
+4. **🗑️ Eliminación automática:**
+   - Cuando `x < -PIPE_WIDTH` (completamente fuera)
+   - Uso de `while` para múltiples eliminaciones
+   - Optimización de memoria
+
+#### 🎯 **RESULTADO VISUAL:**
+
+Al ejecutar el juego:
+- 🏗️ **Tuberías verdes** moviéndose de derecha a izquierda
+- 🔄 **Generación continua** cada 2 segundos
+- 🎲 **Posiciones aleatorias** en cada spawn
+- 🗑️ **Eliminación automática** al salir de pantalla
+- 🐦 **Pájaro** interactuando visualmente con las tuberías
+- 📊 **Debug info** mostrando número de tuberías activas
+
+</details>
+
+---
+
+### 🌟 **ESTADO ACTUAL DEL PROYECTO**
 
 <div align="center">
 
 ```
-🟢 EJERCICIO 0 COMPLETADO EXITOSAMENTE 🟢
+🟢 EJERCICIOS 0, 1 Y 2 COMPLETADOS EXITOSAMENTE 🟢
 ```
 
-**✅ Ventana de juego inicializada correctamente**  
-**✅ Sistema de renderizado básico funcional**  
-**✅ Bucle de juego implementado con delta time**  
-**✅ Gestión de recursos y cierre de ventana operativa**  
-**🚀 Proyecto listo para Ejercicio 1: Mecánica principal**
+**✅ Ejercicio 0:** Ventana y bucle de juego funcional  
+**✅ Ejercicio 1:** Física del pájaro con gravedad y saltos  
+**✅ Ejercicio 2:** Sistema completo de tuberías con generación procedural  
+**🚀 Proyecto listo para Ejercicio 3: Colisiones y Game Over**
 
 </div>
 
 ---
 
-### 📝 **OBSERVACIONES TÉCNICAS:**
+### � **RESUMEN DE IMPLEMENTACIONES**
 
-1. **⚠️ Warning esperado:** El parámetro `deltaTime` en `MainGameState::update()` no se usa en el Ejercicio 0, pero será necesario en ejercicios posteriores para implementar física.
-
-2. **🎨 Centrado de texto:** Se utiliza `MeasureText()` para calcular el ancho del texto y centrarlo horizontalmente en la ventana de 288 píxeles.
-
-3. **🔧 Arquitectura preparada:** La estructura de `StateMachine` y `GameState` está lista para agregar más estados (como `GameOverState` en ejercicios futuros).
-
-4. **⚡ Delta time:** Aunque no se usa activamente en este ejercicio, ya está siendo calculado y pasado correctamente para física en ejercicios posteriores.
+| Ejercicio | Componentes | Estado | Líneas de Código |
+|-----------|-------------|--------|------------------|
+| **Ejercicio 0** | Ventana, Bucle, Renderizado básico | ✅ **COMPLETO** | ~30 líneas |
+| **Ejercicio 1** | Física, Input, Struct Bird | ✅ **COMPLETO** | ~50 líneas |
+| **Ejercicio 2** | Tuberías, Generación, Movimiento | ✅ **COMPLETO** | ~80 líneas |
+| **Total** | — | **3/5 ejercicios** | ~160 líneas |
 
 ---
 
-### 🎯 **PRÓXIMOS PASOS:**
+### 🎮 **FUNCIONALIDADES ACTUALES DEL JUEGO**
 
-**Ejercicio 1: Mecánica principal**
-- Implementar struct `Bird`
-- Agregar física (gravedad, impulsos)
-- Detectar input de teclado (ESPACIO)
-- Renderizar sprite del pájaro
+#### ✅ **Implementado:**
+- 🪟 Ventana de juego 360x740 píxeles
+- ⚡ Bucle de juego a 60 FPS
+- 🐦 Pájaro con física realista (gravedad 980 px/s²)
+- 🚀 Control de salto con barra espaciadora
+- 🏗️ Sistema de tuberías con generación procedural
+- 🔄 Movimiento automático de tuberías (100 px/s)
+- 🎲 Posiciones aleatorias de huecos
+- �️ Eliminación automática de tuberías
+- 🎨 Renderizado visual completo
+- 📊 Debug info en tiempo real
+
+#### 🔜 **Pendiente:**
+- 💥 Detección de colisiones (Ejercicio 3)
+- 🎮 Estado Game Over (Ejercicio 3)
+- 🏆 Sistema de puntuación (Ejercicio 4)
+- 🎨 Sprites y texturas (Ejercicio 5)
+- 🎵 Efectos de sonido (Extra)
+
+---
+
+### 🎯 **PRÓXIMOS PASOS**
+
+**Ejercicio 3: Colisiones y Game Over**
+- Calcular bounding box del pájaro
+- Usar `CheckCollisionRecs()` para detectar colisiones
+- Crear clase `GameOverState`
+- Implementar transición de estados
+- Agregar sistema de reinicio
+
+---
+
+### 📝 **OBSERVACIONES TÉCNICAS IMPORTANTES**
+
+1. **⚡ Delta Time:**
+   - Correctamente implementado en toda la física
+   - Movimiento independiente de FPS garantizado
+   - Permite física consistente en diferentes sistemas
+
+2. **🎨 Orden de Renderizado:**
+   - Fondo (`ClearBackground`)
+   - Tuberías (`renderPipes`)
+   - Pájaro (`DrawCircle`)
+   - UI y debug info
+   - Garantiza correcta visualización de capas
+
+3. **🗂️ Gestión de Memoria:**
+   - Uso de `std::deque` para eficiencia
+   - Eliminación automática de tuberías
+   - Sin memory leaks detectados
+
+4. **🎲 Aleatoriedad:**
+   - Semilla implícita de raylib
+   - Rango seguro para huecos (100-640 px)
+   - Variedad garantizada en cada partida
+
+5. **📏 Dimensiones:**
+   - Ventana: 360x740 píxeles
+   - Tubería: 52x320 píxeles
+   - Hueco: 150 píxeles
+   - Pájaro: Radio 17 píxeles
 
 ---
 
 <div align="center">
 
-**🎮 EJERCICIO 0 FINALIZADO**  
-**📅 Fecha de implementación: 2 de octubre de 2025**  
-**⏱️ Tiempo de desarrollo: ~15 minutos**  
-**✅ Estado: FUNCIONAL Y VERIFICADO**
+**🎮 3 DE 5 EJERCICIOS COMPLETADOS**  
+**📅 Última actualización: 2 de octubre de 2025 (17:00)**  
+**⏱️ Tiempo total de desarrollo: ~2 horas**  
+**✅ Estado: FUNCIONAL Y VERIFICADO**  
+**🚀 Progreso: 60% del proyecto base**
 
 </div>

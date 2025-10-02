@@ -13,7 +13,15 @@ void MainGameState::init()
     bird.y = 200.0f;
     bird.vy = 0.0f; // Velocidad inicial en 0
     
+    // Ejercicio 2: Inicializar sistema de tuberías
+    pipes.clear();                  // Limpiar tuberías existentes
+    pipe_spawn_timer = 1.0f;        // Primera tubería aparece pronto
+    
+    // Generar algunas tuberías iniciales
+    generatePipe();
+    
     std::cout << "🐦 Pájaro inicializado en posición (" << bird.x << ", " << bird.y << ")\n";
+    std::cout << "🏗️  Sistema de tuberías inicializado\n";
 }
 
 // 🎯 Propósito: Manejar la entrada del usuario (en este caso, el salto del pájaro)
@@ -33,24 +41,31 @@ void MainGameState::update(float deltaTime) // deltaTime  es el tiempo en segund
     bird.vy += GRAVITY * deltaTime;  // Acelerar hacia abajo
     bird.y += bird.vy * deltaTime;   // Actualizar posición vertical
     
+    // Ejercicio 2: Actualizar sistema de tuberías
+    updatePipes(deltaTime);
+    
     // Debug: mostrar posición cada segundo (opcional)
     static float debug_timer = 0.0f;
     debug_timer += deltaTime;
     if (debug_timer >= 1.0f)
     {
-        std::cout << "🎮 Posición Y: " << bird.y << " | Velocidad: " << bird.vy << "\n";
+        std::cout << "🎮 Posición Y: " << bird.y << " | Velocidad: " << bird.vy 
+                  << " | Tuberías activas: " << pipes.size() << "\n";
         debug_timer = 0.0f;
     }
 }
 
 void MainGameState::render()
 {
-    // Ejercicio 1: Renderizado del pájaro como círculo rojo
+    // Ejercicio 1 y 2: Renderizado del juego
     BeginDrawing();
     
         ClearBackground(SKYBLUE);
         
-        // Dibujar el pájaro
+        // Ejercicio 2: Dibujar tuberías primero (fondo)
+        renderPipes();
+        
+        // Ejercicio 1: Dibujar el pájaro (frente)
         DrawCircle(
             static_cast<int>(bird.x), 
             static_cast<int>(bird.y), 
@@ -62,9 +77,85 @@ void MainGameState::render()
         DrawText("Presiona ESPACIO para saltar", 10, 10, 20, WHITE);
         DrawText("Presiona ESC para salir", 10, 40, 15, LIGHTGRAY);
         
-        // Mostrar posición del pájaro (debug)
-        DrawText(("Posicion: " + std::to_string(static_cast<int>(bird.y))).c_str(), 
+        // Debug info
+        DrawText(("Posicion Y: " + std::to_string(static_cast<int>(bird.y))).c_str(), 
                  10, 70, 15, YELLOW);
+        DrawText(("Tuberias: " + std::to_string(pipes.size())).c_str(), 
+                 10, 90, 15, YELLOW);
     
     EndDrawing();
+}
+
+// ========== EJERCICIO 2: MÉTODOS AUXILIARES PARA TUBERÍAS ==========
+
+void MainGameState::generatePipe()
+{
+    // Generar posición Y aleatoria para el hueco
+    // El hueco debe estar entre los límites de la pantalla
+    int min_gap_y = static_cast<int>(PIPE_GAP / 2 + 50);
+    int max_gap_y = static_cast<int>(740 - PIPE_GAP / 2 - 50); // 740 es la altura de la ventana
+    
+    float gap_center_y = static_cast<float>(GetRandomValue(min_gap_y, max_gap_y));
+    
+    // Crear nueva tubería
+    PipePair new_pipe;
+    new_pipe.scored = false;
+    
+    // Tubería superior: desde arriba hasta el inicio del hueco
+    new_pipe.top.x = 360.0f; // Aparece fuera de pantalla (ancho ventana)
+    new_pipe.top.y = 0.0f;
+    new_pipe.top.width = PIPE_WIDTH;
+    new_pipe.top.height = gap_center_y - PIPE_GAP / 2;
+    
+    // Tubería inferior: desde el final del hueco hasta abajo
+    new_pipe.bot.x = 360.0f;
+    new_pipe.bot.y = gap_center_y + PIPE_GAP / 2;
+    new_pipe.bot.width = PIPE_WIDTH;
+    new_pipe.bot.height = 740.0f - new_pipe.bot.y; // Hasta el fondo
+    
+    pipes.push_back(new_pipe);
+    
+    std::cout << "🏗️  Nueva tubería generada en Y: " << gap_center_y << "\n";
+}
+
+void MainGameState::updatePipes(float deltaTime)
+{
+    // Actualizar timer para generar nuevas tuberías
+    pipe_spawn_timer -= deltaTime;
+    if (pipe_spawn_timer <= 0.0f)
+    {
+        generatePipe();
+        pipe_spawn_timer = PIPE_SPAWN_TIME;
+    }
+    
+    // Mover todas las tuberías hacia la izquierda
+    for (auto& pipe : pipes)
+    {
+        pipe.top.x -= PIPE_SPEED * deltaTime;
+        pipe.bot.x -= PIPE_SPEED * deltaTime;
+    }
+    
+    // Eliminar tuberías que salieron de la pantalla
+    while (!pipes.empty() && pipes.front().top.x < -PIPE_WIDTH)
+    {
+        pipes.pop_front();
+        std::cout << "🗑️  Tubería eliminada (fuera de pantalla)\n";
+    }
+}
+
+void MainGameState::renderPipes()
+{
+    // Dibujar todas las tuberías activas
+    for (const auto& pipe : pipes)
+    {
+        // Tubería superior (verde oscuro)
+        DrawRectangleRec(pipe.top, DARKGREEN);
+        // Borde de la tubería superior
+        DrawRectangleLinesEx(pipe.top, 2, GREEN);
+        
+        // Tubería inferior (verde oscuro)
+        DrawRectangleRec(pipe.bot, DARKGREEN);
+        // Borde de la tubería inferior
+        DrawRectangleLinesEx(pipe.bot, 2, GREEN);
+    }
 }
