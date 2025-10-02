@@ -59,6 +59,12 @@ class MainGameState : public GameState
         std::deque<PipePair> pipes;        // Cola de tuberías activas
         float pipe_spawn_timer;            // Timer para generar nuevas tuberías
         
+        // Ejercicio 3: Estado del juego
+        bool game_over;                    // Flag de game over
+        
+        // Ejercicio 4: Sistema de puntuación
+        int score;                         // Puntuación actual
+        
         // Métodos auxiliares para tuberías
         void generatePipe();               // Generar nueva tubería
         void updatePipes(float deltaTime); // Actualizar movimiento y eliminación
@@ -67,4 +73,7 @@ class MainGameState : public GameState
         // Ejercicio 3: Métodos de colisiones
         Rectangle getBirdBoundingBox() const;  // Calcular bounding box del pájaro
         bool checkCollisions();                // Detectar colisiones con tuberías y límites
+        
+        // Ejercicio 4: Métodos de puntuación
+        void updateScore();                // Actualizar puntuación al pasar tuberías
 };

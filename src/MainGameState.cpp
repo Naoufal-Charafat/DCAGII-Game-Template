@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include <iostream>
 #include <memory>
+#include <string>
 
 MainGameState::MainGameState()
 {
@@ -20,11 +21,18 @@ void MainGameState::init()
     pipes.clear();                  // Limpiar tuberías existentes
     pipe_spawn_timer = 1.0f;        // Primera tubería aparece pronto
     
+    // Ejercicio 3: Inicializar estado del juego
+    game_over = false;              // Sin game over al inicio
+    
+    // Ejercicio 4: Inicializar puntuación
+    score = 0;                      // Puntuación inicial en 0
+    
     // Generar algunas tuberías iniciales
     generatePipe();
     
     std::cout << "🐦 Pájaro inicializado en posición (" << bird.x << ", " << bird.y << ")\n";
     std::cout << "🏗️  Sistema de tuberías inicializado\n";
+    std::cout << "🏆 Puntuación inicializada: " << score << "\n";
 }
 
 // 🎯 Propósito: Manejar la entrada del usuario (en este caso, el salto del pájaro)
@@ -47,14 +55,21 @@ void MainGameState::update(float deltaTime) // deltaTime  es el tiempo en segund
     // Ejercicio 2: Actualizar sistema de tuberías
     updatePipes(deltaTime);
     
+    // Ejercicio 4: Actualizar puntuación
+    updateScore();
+    
     // Ejercicio 3: Detectar colisiones
     if (checkCollisions())
     {
-        std::cout << "💥 ¡COLISIÓN DETECTADA! Transición a Game Over\n";
+        std::cout << "💥 ¡COLISIÓN DETECTADA! Puntuación final: " << score << "\n";
+        
+        // Crear GameOverState y pasar la puntuación
+        auto game_over_state = std::make_unique<GameOverState>();
+        game_over_state->setScore(score);  // Pasar puntuación
         
         // Transición a GameOverState
         this->state_machine->add_state(
-            std::make_unique<GameOverState>(), 
+            std::move(game_over_state), 
             true  // Reemplazar estado actual
         );
         return;  // Salir del update para evitar procesar más lógica
@@ -66,7 +81,7 @@ void MainGameState::update(float deltaTime) // deltaTime  es el tiempo en segund
     if (debug_timer >= 1.0f)
     {
         std::cout << "🎮 Posición Y: " << bird.y << " | Velocidad: " << bird.vy 
-                  << " | Tuberías activas: " << pipes.size() << "\n";
+                  << " | Tuberías: " << pipes.size() << " | Puntuación: " << score << "\n";
         debug_timer = 0.0f;
     }
 }
@@ -89,15 +104,15 @@ void MainGameState::render()
             RED
         );
         
-        // Instrucciones en pantalla
-        DrawText("Presiona ESPACIO para saltar", 10, 10, 20, WHITE);
-        DrawText("Presiona ESC para salir", 10, 40, 15, LIGHTGRAY);
+        // Ejercicio 4: Mostrar puntuación en pantalla (centrada arriba)
+        std::string score_text = std::to_string(score);
+        int score_font_size = 50;
+        int score_width = MeasureText(score_text.c_str(), score_font_size);
+        DrawText(score_text.c_str(), (360 - score_width) / 2, 50, score_font_size, WHITE);
         
-        // Debug info
-        DrawText(("Posicion Y: " + std::to_string(static_cast<int>(bird.y))).c_str(), 
-                 10, 70, 15, YELLOW);
-        DrawText(("Tuberias: " + std::to_string(pipes.size())).c_str(), 
-                 10, 90, 15, YELLOW);
+        // Instrucciones en pantalla
+        DrawText("Presiona ESPACIO para saltar", 10, 650, 15, WHITE);
+        DrawText("Presiona ESC para salir", 10, 670, 12, LIGHTGRAY);
     
     EndDrawing();
 }
@@ -230,4 +245,21 @@ bool MainGameState::checkCollisions()
     
     // No hay colisiones
     return false;
+}
+
+// ========== EJERCICIO 4: MÉTODO DE PUNTUACIÓN ==========
+
+void MainGameState::updateScore()
+{
+    // Verificar cada tubería para ver si el pájaro la ha pasado
+    for (auto& pipe : pipes)
+    {
+        // Si la tubería no ha sido contada y el pájaro la pasó
+        if (!pipe.scored && bird.x > pipe.top.x + PIPE_WIDTH)
+        {
+            pipe.scored = true;  // Marcar como contada
+            score++;             // Incrementar puntuación
+            std::cout << "🏆 ¡Punto! Puntuación: " << score << "\n";
+        }
+    }
 }

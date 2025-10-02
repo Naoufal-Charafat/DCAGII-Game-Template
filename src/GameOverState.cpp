@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include <iostream>
 #include <memory>
+#include <string>
 
 GameOverState::GameOverState() : final_score(0)
 {
@@ -43,7 +44,7 @@ void GameOverState::update(float deltaTime)
 
 void GameOverState::render()
 {
-    // Ejercicio 3: Renderizado de pantalla Game Over
+    // Ejercicio 3 y 4: Renderizado de pantalla Game Over con puntuación
     BeginDrawing();
     
         // Fondo igual al juego (azul cielo)
@@ -52,17 +53,24 @@ void GameOverState::render()
         // Texto principal "GAME OVER"
         const char* game_over_text = "GAME OVER";
         int text_width = MeasureText(game_over_text, 40);
-        DrawText(game_over_text, (360 - text_width) / 2, 300, 40, RED);
+        DrawText(game_over_text, (360 - text_width) / 2, 250, 40, RED);
+        
+        // Ejercicio 4: Mostrar puntuación final
+        std::string score_label = "Puntuacion: ";
+        std::string score_value = std::to_string(final_score);
+        std::string full_score = score_label + score_value;
+        int score_width = MeasureText(full_score.c_str(), 30);
+        DrawText(full_score.c_str(), (360 - score_width) / 2, 320, 30, WHITE);
         
         // Instrucciones para reiniciar
         const char* restart_text = "Presiona ESPACIO para reiniciar";
         int restart_width = MeasureText(restart_text, 20);
-        DrawText(restart_text, (360 - restart_width) / 2, 370, 20, WHITE);
+        DrawText(restart_text, (360 - restart_width) / 2, 400, 20, WHITE);
         
         // Instrucción para salir
         const char* exit_text = "Presiona ESC para salir";
         int exit_width = MeasureText(exit_text, 15);
-        DrawText(exit_text, (360 - exit_width) / 2, 410, 15, LIGHTGRAY);
+        DrawText(exit_text, (360 - exit_width) / 2, 440, 15, LIGHTGRAY);
     
     EndDrawing();
 }

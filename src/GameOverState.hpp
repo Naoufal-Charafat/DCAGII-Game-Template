@@ -16,8 +16,11 @@ class GameOverState : public GameState
 
         void pause() override {};
         void resume() override {};
+        
+        // Ejercicio 4: Método para recibir puntuación final
+        void setScore(int score) { final_score = score; }
     
     private:
-        // Para futuro: almacenar puntuación final
+        // Ejercicio 4: Almacenar puntuación final
         int final_score;
 };
