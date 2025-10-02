@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BUILD_DIR="$ROOT_DIR/build"
+TARGET="$BUILD_DIR/game"
+
+if [[ ! -f "$ROOT_DIR/vendor/lib/libraylib.a" ]]; then
+    echo "Error: no se encuentra vendor/lib/libraylib.a" >&2
+    echo "Compila raylib y coloca la librería estática en vendor/lib antes de ejecutar este script." >&2
+    exit 1
+fi
+
+mkdir -p "$BUILD_DIR"
+
+echo "[run] Compilando el proyecto..."
+g++ -std=c++17 -Wall -Wextra -O2 -o "$TARGET" "$ROOT_DIR"/src/*.cpp \
+    -I "$ROOT_DIR"/src \
+    -I "$ROOT_DIR"/vendor/include \
+    -L "$ROOT_DIR"/vendor/lib \
+    -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+
+echo "[run] Ejecución del juego..."
+exec "$TARGET"

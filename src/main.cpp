@@ -5,10 +5,11 @@
 #include <chrono>
 #include <iostream>
 
+// 🎯 Propósito: Inicialización del motor raylib y control del bucle principal del juego.
 int main()
 { 
     // Ejercicio 0: Inicialización de ventana
-    InitWindow(288, 512, "Flappy Bird DCA");
+    InitWindow(360, 740, "Flappy Bird DCA");
     
     // Verificar que la ventana se inicializó correctamente
     if (!IsWindowReady())
@@ -23,22 +24,26 @@ int main()
         return 1;
     }
     
-    SetTargetFPS(60);
+    SetTargetFPS(60);// Establecer FPS objetivo
     
     float delta_time = 0.0f;
 
-    StateMachine state_machine = StateMachine();
-    state_machine.add_state(std::make_unique<MainGameState>(), false);
-    state_machine.handle_state_changes(delta_time);
-
+    StateMachine state_machine = StateMachine(); // Crear máquina de estados
+    state_machine.add_state(std::make_unique<MainGameState>(), false); // Agregar estado principal
+    state_machine.handle_state_changes(delta_time); // Inicializar primer estado
+    
+    
+    /*
+     Por qué es importante: Controla el bucle de vida completo del juego y garantiza un FPS consistente.
+    */
     while (!state_machine.is_game_ending() && !WindowShouldClose())// Detectar cierre de ventana
     {
-        delta_time = GetFrameTime();
+        delta_time = GetFrameTime();// Tiempo entre frames
         
-        state_machine.handle_state_changes(delta_time);
-        state_machine.getCurrentState()->handleInput();
-        state_machine.getCurrentState()->update(delta_time);
-        state_machine.getCurrentState()->render();       
+        state_machine.handle_state_changes(delta_time);// Procesar cambios de estado
+        state_machine.getCurrentState()->handleInput();// Manejar entrada
+        state_machine.getCurrentState()->update(delta_time);// Actualizar lógica
+        state_machine.getCurrentState()->render();       // Renderizar
     }
 
     // Cerrar ventana al finalizar
