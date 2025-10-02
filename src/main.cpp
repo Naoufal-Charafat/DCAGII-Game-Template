@@ -1,5 +1,6 @@
 #include <StateMachine.hpp>
 #include <MainGameState.hpp>
+#include <MenuState.hpp>
 #include <raylib.h>
 #include <memory>
 #include <chrono>
@@ -29,7 +30,7 @@ int main()
     float delta_time = 0.0f;
 
     StateMachine state_machine = StateMachine(); // Crear máquina de estados
-    state_machine.add_state(std::make_unique<MainGameState>(), false); // Agregar estado principal
+    state_machine.add_state(std::make_unique<MenuState>(), false); // Comenzar con menú principal
     state_machine.handle_state_changes(delta_time); // Inicializar primer estado
     
     

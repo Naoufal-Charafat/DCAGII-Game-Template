@@ -27,7 +27,7 @@ class MainGameState : public GameState
 {
     public:
         MainGameState();
-        ~MainGameState() = default;
+        ~MainGameState();  // Ejercicio 5: Necesario para liberar texturas
 
         void init() override; //  Cargar texturas, inicializar entidades, configurar parámetros
         void handleInput() override; //  Detectar salto del pájaro (SPACE), pausas, etc.
@@ -50,7 +50,8 @@ class MainGameState : public GameState
         const float PIPE_SPEED = 100.0f;   // Velocidad de movimiento horizontal
         const float PIPE_SPACING = 200.0f; // Espacio entre pares de tuberías
         const float PIPE_GAP = 150.0f;     // Hueco entre tubería superior e inferior
-        const float PIPE_SPAWN_TIME = 2.0f; // Tiempo entre generación de tuberías
+        const float PIPE_SPAWN_TIME = 2.0f; // Tiempo entre generación de tuberías (DEPRECATED)
+        const float PIPE_SPAWN_DISTANCE = 250.0f; // ⚡ Distancia horizontal mínima entre tuberías
         
         // Entidades del juego
         Bird bird;
@@ -64,6 +65,12 @@ class MainGameState : public GameState
         
         // Ejercicio 4: Sistema de puntuación
         int score;                         // Puntuación actual
+        
+        // Ejercicio 5: Texturas y sprites
+        Texture2D bird_texture;            // Textura del pájaro
+        Texture2D pipe_texture;            // Textura de las tuberías
+        Texture2D background_texture;      // Textura del fondo (opcional)
+        bool use_sprites;                  // Flag para usar sprites o primitivas
         
         // Métodos auxiliares para tuberías
         void generatePipe();               // Generar nueva tubería
