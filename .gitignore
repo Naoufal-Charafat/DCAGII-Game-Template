@@ -41,4 +41,8 @@
 *.dwo
 
 .github/
-.vscode/
+.vscode/ 
+
+# Project specific folders
+docs/
+build/
