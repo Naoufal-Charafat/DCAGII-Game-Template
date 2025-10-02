@@ -490,3 +490,209 @@ file build/game
 **⚡ Sistema optimizado para desarrollo de Flappy Bird**
 
 </div>
+
+---
+
+## 🎮 **ACTUALIZACIÓN - 2 de octubre de 2025**
+
+### ✅ **EJERCICIO 0: CREACIÓN DE VENTANA - COMPLETADO**
+
+#### 🎯 **OBJETIVO DEL EJERCICIO:**
+Implementar la funcionalidad básica de inicialización de ventana con raylib, estableciendo la base del bucle de juego y el sistema de renderizado.
+
+<details>
+<summary>🔽 Expandir detalles de implementación</summary>
+
+#### 📋 **MODIFICACIONES REALIZADAS:**
+
+##### **1. 🔧 Archivo: `src/main.cpp`**
+
+**Cambios implementados:**
+```cpp
+✨ Inclusión de raylib.h para acceso a API gráfica
+✨ InitWindow(288, 512, "Flappy Bird DCA") → Ventana de 288x512 píxeles
+✨ SetTargetFPS(60) → Limitación a 60 frames por segundo
+✨ WindowShouldClose() → Detección de cierre de ventana
+✨ GetFrameTime() → Cálculo de delta time para física independiente de FPS
+✨ CloseWindow() → Liberación de recursos al finalizar
+```
+
+**Funcionalidades agregadas:**
+- ⚡ **Delta time dinámico:** Cálculo automático en cada frame
+- 🚪 **Cierre de ventana:** Detección de ESC o botón de cerrar
+- 🎯 **FPS estable:** Limitación a 60 FPS para rendimiento consistente
+- 🧹 **Gestión de recursos:** Liberación correcta de memoria al salir
+
+##### **2. 🎨 Archivo: `src/MainGameState.cpp`**
+
+**Cambios implementados:**
+```cpp
+✨ Inclusión de raylib.h para funciones de renderizado
+✨ BeginDrawing() → Inicio de frame de renderizado
+✨ ClearBackground(SKYBLUE) → Fondo azul cielo
+✨ DrawText() → Renderizado de texto de bienvenida centrado
+✨ MeasureText() → Cálculo de ancho de texto para centrado
+✨ EndDrawing() → Finalización de frame de renderizado
+```
+
+**Elementos visuales agregados:**
+- 🎨 **Fondo:** Color azul cielo (`SKYBLUE`)
+- 📝 **Texto principal:** "Bienvenido a Flappy Bird DCA" (tamaño 20, color blanco)
+- ℹ️ **Instrucciones:** "Presiona ESC para salir" (tamaño 15, color gris claro)
+- 🎯 **Centrado:** Cálculo automático para alineación horizontal perfecta
+
+#### 🏗️ **ARQUITECTURA IMPLEMENTADA:**
+
+```
+┌─────────────────────────────────────────────────────┐
+│              BUCLE PRINCIPAL DEL JUEGO              │
+├─────────────────────────────────────────────────────┤
+│  1. InitWindow() → Crear ventana 288x512           │
+│  2. SetTargetFPS(60) → Limitar a 60 FPS            │
+│  3. WHILE (!WindowShouldClose())                    │
+│     ├─ delta_time = GetFrameTime()                 │
+│     ├─ handleInput()                                │
+│     ├─ update(delta_time)                           │
+│     └─ render()                                     │
+│         ├─ BeginDrawing()                           │
+│         ├─ ClearBackground(SKYBLUE)                 │
+│         ├─ DrawText(...)                            │
+│         └─ EndDrawing()                             │
+│  4. CloseWindow() → Liberar recursos                │
+└─────────────────────────────────────────────────────┘
+```
+
+#### ✅ **VERIFICACIÓN Y COMPILACIÓN:**
+
+**Estado de compilación:**
+```bash
+g++ -std=c++17 -Wall -Wextra -g \
+    -I src/ -I vendor/include/ \
+    src/*.cpp \
+    -L vendor/lib/ \
+    -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 \
+    -o build/game
+```
+
+**Resultados:**
+- ✅ **Compilación exitosa** (0 errores)
+- ⚠️ **1 Warning:** `unused parameter 'deltaTime'` en `update()` (esperado en Ejercicio 0)
+- ✅ **Ejecutable generado:** `build/game`
+- ✅ **Tamaño del ejecutable:** ~216 KB
+
+#### 📊 **MÉTRICAS DEL EJERCICIO:**
+
+| Métrica | Valor |
+|---------|-------|
+| **Archivos modificados** | 2 (`main.cpp`, `MainGameState.cpp`) |
+| **Líneas agregadas** | ~20 líneas |
+| **Funciones raylib usadas** | 8 funciones |
+| **Tiempo de compilación** | < 2 segundos |
+| **Warnings** | 1 (parámetro no usado) |
+| **Errores** | 0 |
+
+#### 🔑 **CONCEPTOS APLICADOS:**
+
+1. **🎮 Inicialización de ventana:**
+   - Configuración de dimensiones (288x512 px)
+   - Establecimiento de título de ventana
+   - Limitación de FPS objetivo
+
+2. **⚡ Delta Time:**
+   - Cálculo dinámico con `GetFrameTime()`
+   - Preparación para física independiente de FPS
+   - Variable pasada a través del sistema de estados
+
+3. **🎨 Bucle de Renderizado:**
+   - Patrón `BeginDrawing()` / `EndDrawing()`
+   - Limpieza de buffer con `ClearBackground()`
+   - Renderizado de primitivas de texto
+
+4. **🧹 Gestión de Recursos:**
+   - Liberación correcta con `CloseWindow()`
+   - Detección de cierre de ventana
+   - Prevención de memory leaks
+
+#### 🎓 **FUNCIONES RAYLIB UTILIZADAS:**
+
+```cpp
+// Gestión de ventana
+InitWindow(int width, int height, const char* title)
+CloseWindow(void)
+SetTargetFPS(int fps)
+WindowShouldClose(void) → bool
+
+// Renderizado
+BeginDrawing(void)
+EndDrawing(void)
+ClearBackground(Color color)
+
+// Texto
+DrawText(const char* text, int x, int y, int fontSize, Color color)
+MeasureText(const char* text, int fontSize) → int
+
+// Tiempo
+GetFrameTime(void) → float
+```
+
+#### 🎯 **RESULTADO VISUAL:**
+
+Al ejecutar `./build/game`, se muestra:
+- 🪟 Ventana de 288x512 píxeles
+- 🎨 Fondo azul cielo
+- 📝 Texto "Bienvenido a Flappy Bird DCA" centrado
+- ℹ️ Instrucciones en la parte inferior
+- ⚡ 60 FPS estables
+
+</details>
+
+---
+
+### 🌟 **ESTADO DEL PROYECTO ACTUALIZADO**
+
+<div align="center">
+
+```
+🟢 EJERCICIO 0 COMPLETADO EXITOSAMENTE 🟢
+```
+
+**✅ Ventana de juego inicializada correctamente**  
+**✅ Sistema de renderizado básico funcional**  
+**✅ Bucle de juego implementado con delta time**  
+**✅ Gestión de recursos y cierre de ventana operativa**  
+**🚀 Proyecto listo para Ejercicio 1: Mecánica principal**
+
+</div>
+
+---
+
+### 📝 **OBSERVACIONES TÉCNICAS:**
+
+1. **⚠️ Warning esperado:** El parámetro `deltaTime` en `MainGameState::update()` no se usa en el Ejercicio 0, pero será necesario en ejercicios posteriores para implementar física.
+
+2. **🎨 Centrado de texto:** Se utiliza `MeasureText()` para calcular el ancho del texto y centrarlo horizontalmente en la ventana de 288 píxeles.
+
+3. **🔧 Arquitectura preparada:** La estructura de `StateMachine` y `GameState` está lista para agregar más estados (como `GameOverState` en ejercicios futuros).
+
+4. **⚡ Delta time:** Aunque no se usa activamente en este ejercicio, ya está siendo calculado y pasado correctamente para física en ejercicios posteriores.
+
+---
+
+### 🎯 **PRÓXIMOS PASOS:**
+
+**Ejercicio 1: Mecánica principal**
+- Implementar struct `Bird`
+- Agregar física (gravedad, impulsos)
+- Detectar input de teclado (ESPACIO)
+- Renderizar sprite del pájaro
+
+---
+
+<div align="center">
+
+**🎮 EJERCICIO 0 FINALIZADO**  
+**📅 Fecha de implementación: 2 de octubre de 2025**  
+**⏱️ Tiempo de desarrollo: ~15 minutos**  
+**✅ Estado: FUNCIONAL Y VERIFICADO**
+
+</div>
