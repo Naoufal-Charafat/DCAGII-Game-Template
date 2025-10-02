@@ -1,6 +1,9 @@
 #include <MainGameState.hpp>
+#include <GameOverState.hpp>
+#include <StateMachine.hpp>
 #include <raylib.h>
 #include <iostream>
+#include <memory>
 
 MainGameState::MainGameState()
 {
@@ -43,6 +46,19 @@ void MainGameState::update(float deltaTime) // deltaTime  es el tiempo en segund
     
     // Ejercicio 2: Actualizar sistema de tuberías
     updatePipes(deltaTime);
+    
+    // Ejercicio 3: Detectar colisiones
+    if (checkCollisions())
+    {
+        std::cout << "💥 ¡COLISIÓN DETECTADA! Transición a Game Over\n";
+        
+        // Transición a GameOverState
+        this->state_machine->add_state(
+            std::make_unique<GameOverState>(), 
+            true  // Reemplazar estado actual
+        );
+        return;  // Salir del update para evitar procesar más lógica
+    }
     
     // Debug: mostrar posición cada segundo (opcional)
     static float debug_timer = 0.0f;
@@ -158,4 +174,60 @@ void MainGameState::renderPipes()
         // Borde de la tubería inferior
         DrawRectangleLinesEx(pipe.bot, 2, GREEN);
     }
+}
+
+// ========== EJERCICIO 3: MÉTODOS DE COLISIONES ==========
+
+Rectangle MainGameState::getBirdBoundingBox() const
+{
+    // Crear bounding box cuadrado centrado en la posición del pájaro
+    // Usamos un tamaño ligeramente menor que el radio visual para colisiones más justas
+    float box_size = BIRD_RADIUS * 2.0f * 0.8f;  // 80% del diámetro
+    
+    return Rectangle{
+        bird.x - box_size / 2.0f,  // x (centrado)
+        bird.y - box_size / 2.0f,  // y (centrado)
+        box_size,                   // width
+        box_size                    // height
+    };
+}
+
+bool MainGameState::checkCollisions()
+{
+    // Obtener bounding box del pájaro
+    Rectangle bird_box = getBirdBoundingBox();
+    
+    // 1. Colisión con límites de pantalla (arriba y abajo)
+    if (bird.y - BIRD_RADIUS <= 0)  // Colisión con techo
+    {
+        std::cout << "💥 Colisión con el TECHO\n";
+        return true;
+    }
+    
+    if (bird.y + BIRD_RADIUS >= 740)  // Colisión con suelo (altura ventana)
+    {
+        std::cout << "💥 Colisión con el SUELO\n";
+        return true;
+    }
+    
+    // 2. Colisión con tuberías
+    for (const auto& pipe : pipes)
+    {
+        // Comprobar colisión con tubería superior
+        if (CheckCollisionRecs(bird_box, pipe.top))
+        {
+            std::cout << "💥 Colisión con TUBERÍA SUPERIOR\n";
+            return true;
+        }
+        
+        // Comprobar colisión con tubería inferior
+        if (CheckCollisionRecs(bird_box, pipe.bot))
+        {
+            std::cout << "💥 Colisión con TUBERÍA INFERIOR\n";
+            return true;
+        }
+    }
+    
+    // No hay colisiones
+    return false;
 }

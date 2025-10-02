@@ -63,4 +63,8 @@ class MainGameState : public GameState
         void generatePipe();               // Generar nueva tubería
         void updatePipes(float deltaTime); // Actualizar movimiento y eliminación
         void renderPipes();                // Renderizar todas las tuberías
+        
+        // Ejercicio 3: Métodos de colisiones
+        Rectangle getBirdBoundingBox() const;  // Calcular bounding box del pájaro
+        bool checkCollisions();                // Detectar colisiones con tuberías y límites
 };
