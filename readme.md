@@ -26,6 +26,12 @@
 
 ---
 
+<div align="center">
+
+<img src="assets/sprites/start-game.png" alt="Pantalla de inicio Flappy Bird DCA Edition" width="420" style="border-radius: 16px; box-shadow: 0 4px 24px #0003; margin-bottom: 16px;" />
+
+</div>
+
 ## 🎯 SOBRE EL JUEGO
 
 **Flappy Bird DCA Edition** es una reimplementación moderna del icónico juego arcade que capturó los corazones (y la frustración) de millones. Desarrollado desde cero con **C++17** y la poderosa librería gráfica **raylib**, este proyecto combina nostalgia retro con arquitectura de software profesional.
@@ -317,24 +323,7 @@ chmod +x run
 
 ## 🎨 CAPTURAS DE PANTALLA
 
-<div align="center">
 
-### 🎪 **MENÚ PRINCIPAL**
-*Pantalla de inicio con fondo personalizado y texto parpadeante*
-
----
-
-### 🕹️ **GAMEPLAY**
-*Físicas realistas, sprites HD y puntuación con sombra dinámica*
-
----
-
-### 💀 **GAME OVER**
-*Pantalla de derrota con puntuación final en rojo dramático*
-
-</div>
-
----
 
 ## 🔧 CARACTERÍSTICAS TÉCNICAS AVANZADAS
 
@@ -553,4 +542,3 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 ### ⭐ *Si te gustó el proyecto, considera darle una estrella* ⭐
 
 </div>
- 
