@@ -1,5 +1,6 @@
 #pragma once
 #include <GameState.hpp>
+#include <raylib.h>
 
 // 🎯 Ejercicio 3: Estado de Game Over
 // Propósito: Mostrar pantalla de derrota y permitir reiniciar el juego
@@ -7,7 +8,7 @@ class GameOverState : public GameState
 {
     public:
         GameOverState();
-        ~GameOverState() = default;
+        ~GameOverState();
 
         void init() override;
         void handleInput() override;
@@ -23,4 +24,9 @@ class GameOverState : public GameState
     private:
         // Ejercicio 4: Almacenar puntuación final
         int final_score;
+        
+        // Audio y fuente
+        Sound die_sound;              // Sonido de muerte
+        Font custom_font;             // Fuente personalizada
+        bool use_custom_font;         // Flag para usar fuente personalizada
 };

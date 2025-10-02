@@ -10,7 +10,7 @@ MainGameState::MainGameState()
 {
 }
 
-// Ejercicio 5: Destructor para liberar texturas
+// Ejercicio 5: Destructor para liberar texturas, sonidos y fuente
 MainGameState::~MainGameState()
 {
     if (use_sprites)
@@ -19,6 +19,19 @@ MainGameState::~MainGameState()
         if (pipe_texture.id != 0) UnloadTexture(pipe_texture);
         if (background_texture.id != 0) UnloadTexture(background_texture);
         std::cout << "🧹 Texturas liberadas correctamente\n";
+    }
+    
+    // Liberar sonidos
+    if (jump_sound.frameCount > 0) UnloadSound(jump_sound);
+    if (point_sound.frameCount > 0) UnloadSound(point_sound);
+    if (hit_sound.frameCount > 0) UnloadSound(hit_sound);
+    std::cout << "🔊 Sonidos liberados correctamente\n";
+    
+    // Liberar fuente
+    if (use_custom_font)
+    {
+        UnloadFont(custom_font);
+        std::cout << "🔤 Fuente liberada correctamente\n";
     }
 }
 
@@ -77,6 +90,50 @@ void MainGameState::init()
         std::cout << "ℹ️  No se cargó fondo, usando color sólido\n";
     }
     
+    // Cargar fuente personalizada
+    custom_font = LoadFontEx("assets/fonts/LuckiestGuy.ttf", 80, nullptr, 0);
+    if (custom_font.texture.id != 0)
+    {
+        use_custom_font = true;
+        std::cout << "✅ Fuente personalizada cargada correctamente\n";
+    }
+    else
+    {
+        use_custom_font = false;
+        std::cout << "⚠️  No se pudo cargar la fuente, usando fuente por defecto\n";
+    }
+    
+    // Cargar efectos de sonido
+    jump_sound = LoadSound("assets/sounds/jump.wav");
+    if (jump_sound.frameCount > 0)
+    {
+        std::cout << "✅ Sonido de salto cargado correctamente\n";
+    }
+    else
+    {
+        std::cout << "⚠️  No se pudo cargar sonido de salto\n";
+    }
+    
+    point_sound = LoadSound("assets/sounds/point.wav");
+    if (point_sound.frameCount > 0)
+    {
+        std::cout << "✅ Sonido de punto cargado correctamente\n";
+    }
+    else
+    {
+        std::cout << "⚠️  No se pudo cargar sonido de punto\n";
+    }
+    
+    hit_sound = LoadSound("assets/sounds/hit.wav");
+    if (hit_sound.frameCount > 0)
+    {
+        std::cout << "✅ Sonido de colisión cargado correctamente\n";
+    }
+    else
+    {
+        std::cout << "⚠️  No se pudo cargar sonido de colisión\n";
+    }
+    
     // Generar algunas tuberías iniciales
     generatePipe();
     
@@ -93,6 +150,13 @@ void MainGameState::handleInput()
     if (IsKeyPressed(KEY_SPACE))
     {
         bird.vy = JUMP_VELOCITY; // Aplicar impulso hacia arriba
+        
+        // Reproducir sonido de salto
+        if (jump_sound.frameCount > 0)
+        {
+            PlaySound(jump_sound);
+        }
+        
         std::cout << "🚀 ¡Salto! Velocidad: " << bird.vy << "\n";
     }
 }
@@ -112,6 +176,12 @@ void MainGameState::update(float deltaTime) // deltaTime  es el tiempo en segund
     // Ejercicio 3: Detectar colisiones
     if (checkCollisions())
     {
+        // Reproducir sonido de colisión
+        if (hit_sound.frameCount > 0)
+        {
+            PlaySound(hit_sound);
+        }
+        
         std::cout << "💥 ¡COLISIÓN DETECTADA! Puntuación final: " << score << "\n";
         
         // Crear GameOverState y pasar la puntuación
@@ -185,15 +255,32 @@ void MainGameState::render()
         
         // Ejercicio 4: Mostrar puntuación en pantalla (centrada arriba) con sombreado
         std::string score_text = std::to_string(score);
-        int score_font_size = 50;
-        int score_width = MeasureText(score_text.c_str(), score_font_size);
-        int score_x = (360 - score_width) / 2;
-        int score_y = 50;
         
-        // Dibujar sombra (negro, desplazado 3 píxeles)
-        DrawText(score_text.c_str(), score_x + 3, score_y + 3, score_font_size, BLACK);
-        // Dibujar puntuación principal en amarillo
-        DrawText(score_text.c_str(), score_x, score_y, score_font_size, YELLOW);
+        if (use_custom_font)
+        {
+            // Usar fuente personalizada
+            float score_font_size = 60.0f;
+            Vector2 score_measure = MeasureTextEx(custom_font, score_text.c_str(), score_font_size, 2);
+            Vector2 score_pos = {(360 - score_measure.x) / 2, 40};
+            
+            // Dibujar sombra (negro, desplazado 4 píxeles)
+            DrawTextEx(custom_font, score_text.c_str(), {score_pos.x + 4, score_pos.y + 4}, score_font_size, 2, BLACK);
+            // Dibujar puntuación principal en amarillo
+            DrawTextEx(custom_font, score_text.c_str(), score_pos, score_font_size, 2, YELLOW);
+        }
+        else
+        {
+            // Fallback: fuente por defecto
+            int score_font_size = 50;
+            int score_width = MeasureText(score_text.c_str(), score_font_size);
+            int score_x = (360 - score_width) / 2;
+            int score_y = 50;
+            
+            // Dibujar sombra (negro, desplazado 3 píxeles)
+            DrawText(score_text.c_str(), score_x + 3, score_y + 3, score_font_size, BLACK);
+            // Dibujar puntuación principal en amarillo
+            DrawText(score_text.c_str(), score_x, score_y, score_font_size, YELLOW);
+        }
     
     EndDrawing();
 }
@@ -299,16 +386,32 @@ void MainGameState::renderPipes()
 
 Rectangle MainGameState::getBirdBoundingBox() const
 {
-    // Crear bounding box cuadrado centrado en la posición del pájaro
-    // Usamos un tamaño ligeramente menor que el radio visual para colisiones más justas
-    float box_size = BIRD_RADIUS * 2.0f * 0.8f;  // 80% del diámetro
-    
-    return Rectangle{
-        bird.x - box_size / 2.0f,  // x (centrado)
-        bird.y - box_size / 2.0f,  // y (centrado)
-        box_size,                   // width
-        box_size                    // height
-    };
+    // Ajustar hitbox según si usamos sprites o círculo
+    if (use_sprites && bird_texture.id != 0)
+    {
+        // Hitbox basado en el sprite real (34x24 px), pero reducido un 30% para ser más justo
+        float width = bird_texture.width * 0.70f;   // 70% del ancho real
+        float height = bird_texture.height * 0.70f;  // 70% del alto real
+        
+        return Rectangle{
+            bird.x - width / 2.0f,   // x (centrado)
+            bird.y - height / 2.0f,  // y (centrado)
+            width,                    // width
+            height                    // height
+        };
+    }
+    else
+    {
+        // Hitbox para círculo (fallback), reducido al 65% para colisiones más justas
+        float box_size = BIRD_RADIUS * 2.0f * 0.65f;  // 65% del diámetro
+        
+        return Rectangle{
+            bird.x - box_size / 2.0f,  // x (centrado)
+            bird.y - box_size / 2.0f,  // y (centrado)
+            box_size,                   // width
+            box_size                    // height
+        };
+    }
 }
 
 bool MainGameState::checkCollisions()
@@ -363,6 +466,13 @@ void MainGameState::updateScore()
         {
             pipe.scored = true;  // Marcar como contada
             score++;             // Incrementar puntuación
+            
+            // Reproducir sonido de punto
+            if (point_sound.frameCount > 0)
+            {
+                PlaySound(point_sound);
+            }
+            
             std::cout << "🏆 ¡Punto! Puntuación: " << score << "\n";
         }
     }

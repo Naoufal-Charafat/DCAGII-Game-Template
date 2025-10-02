@@ -72,6 +72,13 @@ class MainGameState : public GameState
         Texture2D background_texture;      // Textura del fondo (opcional)
         bool use_sprites;                  // Flag para usar sprites o primitivas
         
+        // Audio y fuente
+        Sound jump_sound;                  // Sonido de salto
+        Sound point_sound;                 // Sonido de punto
+        Sound hit_sound;                   // Sonido de colisión
+        Font custom_font;                  // Fuente personalizada
+        bool use_custom_font;              // Flag para usar fuente personalizada
+        
         // Métodos auxiliares para tuberías
         void generatePipe();               // Generar nueva tubería
         void updatePipes(float deltaTime); // Actualizar movimiento y eliminación
