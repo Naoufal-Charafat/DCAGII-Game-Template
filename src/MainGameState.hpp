@@ -1,6 +1,14 @@
 #pragma once
 #include <GameState.hpp>
 
+// Estructura para representar al pájaro
+struct Bird
+{
+    float x;  // Posición horizontal
+    float y;  // Posición vertical
+    float vy; // Velocidad vertical
+};
+
 // 🎯 Propósito: ¡EL CORAZÓN DEL JUEGO! Contiene toda la lógica específica de Flappy Bird.
 class MainGameState : public GameState
 {
@@ -18,5 +26,11 @@ class MainGameState : public GameState
 
     
     private:
-        char entered_key;
+        // Constantes de física
+        const float GRAVITY = 980.0f;      // Gravedad (píxeles/segundo²)
+        const float JUMP_VELOCITY = -300.0f; // Velocidad de salto
+        const float BIRD_RADIUS = 17.0f;   // Radio del círculo del pájaro
+        
+        // Entidades del juego
+        Bird bird;
 };
